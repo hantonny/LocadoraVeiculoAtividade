@@ -13,6 +13,8 @@ public class ClienteLocadora {
 		ler = new Scanner(System.in);
 
 		int escolha = 0;
+
+		// Autenticar Locadora
 		String login;
 		String senha;
 		System.out.printf("Entrar:");
@@ -20,23 +22,48 @@ public class ClienteLocadora {
 		login = ler.next();
 		System.out.printf("Senha:\n");
 		senha = ler.next();
+		//
+
+		// Clientes
+		String nomeCliente;
+		String categoriaHabilitacao;
+		//
 
 		try {
 			LocadoraRemota locadora = (LocadoraRemota) Naming.lookup("rmi://localhost:2127/locadora");
+			LocadoraRemota carro = (LocadoraRemota) Naming.lookup("rmi://localhost:2127/carro");
 			if (locadora.autenticar(login, senha)) {
 				while (escolha != 3) {
 					System.out.printf("Escolhas as operações\n");
+					System.out.printf("1 - Cadastrar Clientes \n");
+					System.out.printf("2 - Listar Carros \n");
 					escolha = ler.nextInt();
 					switch (escolha) {
 					case 1:
-						try {
-							System.out.printf("Informe o nome da Locadora:\n");
-							String buscanome = ler.next();
-							locadora.procurarLocadora(buscanome);
-							System.out.println("Locadora \"" + buscanome + "\" encontrado!");
-						} catch (Excecao e1) {
-							System.out.println(e1.getMessage());
-						}
+						System.out.printf("Informe o nome do Cliente:\n");
+
+						nomeCliente = ler.next();
+
+						System.out.printf("Informe a Categoria Habilitação:\n");
+
+						categoriaHabilitacao = ler.next();
+
+						locadora.inserirClientes(nomeCliente, categoriaHabilitacao);
+						System.out.println("Cliente " + nomeCliente + " com a Categoria Habilitação "
+								+ categoriaHabilitacao + " inserido com sucesso!");
+
+						// Localizar Locadora - achei importante deixar
+						/*
+						 * try { System.out.printf("Informe o nome da Locadora:\n"); String buscanome =
+						 * ler.next(); locadora.procurarLocadora(buscanome);
+						 * System.out.println("Locadora \"" + buscanome + "\" encontrado!"); } catch
+						 * (Excecao e1) { System.out.println(e1.getMessage()); }
+						 */
+						break;
+					case 2:
+
+						carro.ListarCarros();
+
 						break;
 					case 3:
 						System.out.printf("Obrigado, ter você como cliente é uma satisfação\n");

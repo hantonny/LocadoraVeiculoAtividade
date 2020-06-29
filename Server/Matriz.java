@@ -11,7 +11,10 @@ public class Matriz extends UnicastRemoteObject implements LocadoraRemota {
 	private static final long serialVersionUID = 1L;
 	private Locadoras[] locadoras;
 	private Carros[] carros;
+	private Cliente[] clientes;
 	int proxima;
+	private static Scanner ler;
+	private static Registry r;
 
 	public Matriz(int tamanho) throws RemoteException {
 
@@ -19,6 +22,7 @@ public class Matriz extends UnicastRemoteObject implements LocadoraRemota {
 
 		this.locadoras = new Locadoras[tamanho];
 		this.carros = new Carros[tamanho];
+		this.clientes = new Cliente[tamanho];
 		this.proxima = 0;
 	}
 
@@ -102,13 +106,40 @@ public class Matriz extends UnicastRemoteObject implements LocadoraRemota {
 		proxima++;
 	}
 
+	public synchronized void ListarCarros() throws RemoteException {
+
+		int i = 0;
+		String[] msg = new String[carros.length];
+		while (i < this.carros.length) {
+
+			if (this.carros[i].getRetricao() == 0) {
+				msg[i] = "Carro: " + carros[i].getNome() + " com Placa Final: " + carros[i].getPlaca();
+				System.out.println(msg[i]);
+			}
+
+			i++;
+		}
+
+	}
+
+	// Clientes
+	public synchronized void inserirClientes(int id, String nome, String categoriaHabilitacao) throws RemoteException {
+
+		if (this.proxima == this.clientes.length) {
+
+			proxima = 0;
+		}
+
+		clientes[proxima] = new Cliente(id = proxima, nome, categoriaHabilitacao);
+		proxima++;
+	}
+
 	public static void main(String args[]) {
-		Scanner ler = new Scanner(System.in);
+		ler = new Scanner(System.in);
 
 		int escolha = 0;
 		try {
-			
-			
+			setR(LocateRegistry.createRegistry(2127));
 
 			while (escolha != 3) {
 				String nome;
@@ -128,8 +159,7 @@ public class Matriz extends UnicastRemoteObject implements LocadoraRemota {
 				switch (escolha) {
 				case 1:
 					Matriz locadora = new Matriz(10);
-					
-					Registry r = LocateRegistry.createRegistry(2127);
+
 					Naming.rebind("rmi://localhost:2127/locadora", locadora);
 					System.out.printf("Informe o nome da Locadora:\n");
 
@@ -147,28 +177,30 @@ public class Matriz extends UnicastRemoteObject implements LocadoraRemota {
 					break;
 				case 2:
 					Matriz carro = new Matriz(10);
-					Registry r2 = LocateRegistry.createRegistry(2127);
-					Naming.rebind("rmi://localhost:2127/locadora", carro);
-					
+
+					Naming.rebind("rmi://localhost:2127/carro", carro);
+
 					System.out.printf("Informe a Placa do Carro:\n");
 					placa = ler.nextInt();
-					
+
 					System.out.printf("Informe a Nome do Carro:\n");
 					nomecarro = ler.next();
-					
+
 					System.out.printf("Informe a Retricao do Carro:\n");
+					System.out.printf("0 - Para carros disponíveis:\n");
+					System.out.printf("1 - Para carros indisponíveis:\n");
 					retricao = ler.nextInt();
-					
+
 					System.out.printf("Informe a Locadora do Carro:\n");
 					carrolocadora = ler.next();
-					
+
 					System.out.printf("Informe a preco do Carro:\n");
 					preco = ler.nextDouble();
-					
+
 					carro.inserirCarros(placa, nomecarro, retricao, carrolocadora, preco);
-					
+
 					System.out.println("Carro \"" + nomecarro + "\" inserido com sucesso!");
-					
+
 					break;
 				case 3:
 					System.out.printf("Saindo");
@@ -184,6 +216,20 @@ public class Matriz extends UnicastRemoteObject implements LocadoraRemota {
 
 		}
 
+	}
+
+	@Override
+	public void inserirClientes(String nome, String categoriaHabilitacao) throws RemoteException {
+		// TODO Auto-generated method stub
+
+	}
+
+	public static Registry getR() {
+		return r;
+	}
+
+	public static void setR(Registry r) {
+		Matriz.r = r;
 	}
 
 }

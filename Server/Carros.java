@@ -1,12 +1,12 @@
 
 public class Carros {
-		
+
 	private int placa;
 	private String nome;
 	private int retricao;
 	private String locadora;
 	private double preco;
-	
+
 	public Carros(int placa, String nome, int retricao, String locadora, double preco) {
 		super();
 		this.placa = placa;
@@ -55,5 +55,5 @@ public class Carros {
 	public void setPreco(double preco) {
 		this.preco = preco;
 	}
-	
+
 }
